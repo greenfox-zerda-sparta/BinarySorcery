@@ -9,6 +9,8 @@ public class Fox : MonoBehaviour {
    private int _hunger;
    [SerializeField]
    private int _happiness;
+   [SerializeField]
+   private string _name;
  // private int _fatigue;
  // ha mar van animacio, akkor ha csinalt valamit, attol no a faradtsag es ha eler vmilyen erteket, akkor 
  // aludni kell egyet - ejszakai hatter, csukott szem
@@ -19,12 +21,16 @@ public class Fox : MonoBehaviour {
 	 void Start () {
      PlayerPrefs.SetString("then", "01/26/2017 12:01:01"); // this line is only for testing purpose
      updateStatus ();
+     if (!PlayerPrefs.HasKey ("name")) {
+      PlayerPrefs.SetString ("name", "Greenfox");
+     }
+  _name = PlayerPrefs.GetString ("name");
 	 }
 
   void Update() {
     
   GetComponent<Animator> ().SetBool ("jump", gameObject.transform.position.y > -1.1f);
-  GetComponent<Animator> ().SetBool ("jump_high", gameObject.transform.position.y > 1.1f);
+ // GetComponent<Animator> ().SetBool ("jump_high", gameObject.transform.position.y > 1.1f);
 
     if (Input.GetMouseButtonUp (0)) {
       Vector2 v = new Vector2 (Input.mousePosition.x, Input.mousePosition.y);
@@ -113,6 +119,11 @@ public class Fox : MonoBehaviour {
     get { return _happiness; }
     set { _happiness = value; }
   }
+
+ public string name {
+  get { return _name; }
+  set { _name = value; }
+ }
 
   void updateHappiness (int change){
     happiness += change;
