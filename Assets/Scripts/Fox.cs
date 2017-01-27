@@ -11,15 +11,16 @@ public class Fox : MonoBehaviour {
    private int _happiness;
    [SerializeField]
    private string _name;
- // private int _fatigue;
- // ha mar van animacio, akkor ha csinalt valamit, attol no a faradtsag es ha eler vmilyen erteket, akkor 
- // aludni kell egyet - ejszakai hatter, csukott szem
+   [SerializeField]
+   private int _fatigue;
+  // ha mar van animacio, akkor ha csinalt valamit, attol no a faradtsag es ha eler vmilyen erteket, akkor 
+  // aludni kell egyet - ejszakai hatter, csukott szem. Fatigue value szerinti esellyel nem csinalja meg a dolgokat :)
 
    private bool _serverTime;
    private int _clickCount;
 
 	 void Start () {
-     PlayerPrefs.SetString("then", "01/26/2017 12:01:01"); // this line is only for testing purpose
+    // PlayerPrefs.SetString("then", "01/27/2017 16:01:01"); // this line is only for testing purpose
      updateStatus ();
      if (!PlayerPrefs.HasKey ("name")) {
       PlayerPrefs.SetString ("name", "Greenfox");
@@ -67,6 +68,13 @@ public class Fox : MonoBehaviour {
       _happiness = PlayerPrefs.GetInt ("_happiness");
     }
 
+    if (!PlayerPrefs.HasKey ("_fatigue")) {
+      _fatigue = 0;
+      PlayerPrefs.SetInt ("_fatigue", fatigue);
+    } else {
+      _fatigue = PlayerPrefs.GetInt ("_fatigue");
+    }
+
     if (!PlayerPrefs.HasKey ("then")) {
       PlayerPrefs.SetString ("then", getStringTime ());
     }
@@ -74,13 +82,29 @@ public class Fox : MonoBehaviour {
    //Debug.Log (getTimeSpan ().ToString ());   // for testing TimeSpan
   
     TimeSpan ts = getTimeSpan();
-    _hunger -= 100 - (int)(ts.TotalHours * 2);
+
+    _hunger += (int)(ts.TotalHours * 2);
     if (_hunger > 100) {
       _hunger = 100;
     }
-    _happiness -= (int)((_hunger) * (ts.TotalHours / 5));
+    if (_hunger < 0) {
+      _hunger = 0;
+    }
+
+    _happiness -= _hunger * (int)(ts.TotalHours / 5);
     if (_happiness < 0) {
       _happiness = 0;
+    }     
+    if (_happiness > 100) {
+      _happiness = 100;
+    }
+
+    _fatigue += (int)(ts.TotalHours * 3);
+    if (_fatigue > 100) {
+      _fatigue = 100;
+    }
+    if (_fatigue < 0) {
+      _fatigue = 0;
     }
 
     if (_serverTime) {
@@ -125,11 +149,25 @@ public class Fox : MonoBehaviour {
   set { _name = value; }
  }
 
+  public int fatigue {
+    get { return _fatigue; }
+    set { _fatigue = value; }
+  }
+
   void updateHappiness (int change){
     happiness += change;
     if (happiness > 100) {
        happiness = 100;
     }
+  }
+
+  public void saveFox() {
+    if (!_serverTime) {
+      updateDevice ();
+    }
+    PlayerPrefs.SetInt ("_hunger", _hunger);
+    PlayerPrefs.SetInt ("_happiness", _happiness);
+    PlayerPrefs.SetInt ("_fatigue", _fatigue);
   }
 }
  
